@@ -18,21 +18,13 @@ namespace test {
 
 class MockConnectionIdAlgo : public ConnectionIdAlgo {
  public:
-  GMOCK_METHOD1_(, noexcept, , canParseNonConst, bool(const ConnectionId& id));
-  GMOCK_METHOD1_(
-      ,
-      noexcept,
-      ,
-      parseConnectionId,
-      folly::Expected<ServerConnectionIdParams, QuicInternalException>(
-          const ConnectionId&));
-  GMOCK_METHOD1_(
-      ,
-      noexcept,
-      ,
-      encodeConnectionId,
-      folly::Expected<ConnectionId, QuicInternalException>(
-          const ServerConnectionIdParams&));
+  MOCK_METHOD(bool, canParseNonConst, (const ConnectionId& id), (noexcept));
+  MOCK_METHOD(
+      (folly::Expected<ServerConnectionIdParams, QuicInternalException>),
+      parseConnectionId, (const ConnectionId&), (noexcept));
+  MOCK_METHOD((folly::Expected<ConnectionId, QuicInternalException>),
+              encodeConnectionId, (const ServerConnectionIdParams&),
+              (noexcept));
 
   bool canParse(const ConnectionId& id) const noexcept override {
     return const_cast<MockConnectionIdAlgo&>(*this).canParseNonConst(id);
@@ -56,8 +48,8 @@ class MockQuicPacketBuilder : public PacketBuilderInterface {
   MOCK_METHOD2(push, void(const uint8_t*, size_t));
   MOCK_METHOD1(write, void(const QuicInteger&));
 
-  GMOCK_METHOD0_(, const, , remainingSpaceInPkt, uint32_t());
-  GMOCK_METHOD0_(, const, , getPacketHeader, const PacketHeader&());
+  MOCK_METHOD(uint32_t, remainingSpaceInPkt, (), (const));
+  MOCK_METHOD(const PacketHeader&, getPacketHeader, (), (const));
 
   MOCK_METHOD1(writeBEUint8, void(uint8_t));
   MOCK_METHOD1(writeBEUint16, void(uint16_t));
@@ -66,10 +58,10 @@ class MockQuicPacketBuilder : public PacketBuilderInterface {
   MOCK_METHOD2(appendBytes, void(PacketNum, uint8_t));
   MOCK_METHOD3(appendBytesWithAppender, void(BufAppender&, PacketNum, uint8_t));
   MOCK_METHOD3(appendBytesWithBufWriter, void(BufWriter&, PacketNum, uint8_t));
-  GMOCK_METHOD1_(, noexcept, , accountForCipherOverhead, void(uint8_t));
-  GMOCK_METHOD0_(, noexcept, , canBuildPacketNonConst, bool());
-  GMOCK_METHOD0_(, const, , getHeaderBytes, uint32_t());
-  GMOCK_METHOD0_(, const, , hasFramesPending, bool());
+  MOCK_METHOD(void, accountForCipherOverhead, (uint8_t), (noexcept));
+  MOCK_METHOD(bool, canBuildPacketNonConst, (), (noexcept));
+  MOCK_METHOD(uint32_t, getHeaderBytes, (), (const));
+  MOCK_METHOD(bool, hasFramesPending, (), (const));
   MOCK_METHOD0(releaseOutputBufferMock, void());
   MOCK_METHOD0(encodePacketHeader, void());
 

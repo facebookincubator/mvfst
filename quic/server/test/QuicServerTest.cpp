@@ -1117,10 +1117,10 @@ TEST_F(QuicServerWorkerTest, AssignBufAccessor) {
 
 class MockAcceptObserver : public AcceptObserver {
  public:
-  GMOCK_METHOD1_(, noexcept, , accept, void(QuicTransportBase* const));
-  GMOCK_METHOD1_(, noexcept, , acceptorDestroy, void(QuicServerWorker*));
-  GMOCK_METHOD1_(, noexcept, , observerAttach, void(QuicServerWorker*));
-  GMOCK_METHOD1_(, noexcept, , observerDetach, void(QuicServerWorker*));
+  MOCK_METHOD(void, accept, (QuicTransportBase* const), (noexcept));
+  MOCK_METHOD(void, acceptorDestroy, (QuicServerWorker*), (noexcept));
+  MOCK_METHOD(void, observerAttach, (QuicServerWorker*), (noexcept));
+  MOCK_METHOD(void, observerDetach, (QuicServerWorker*), (noexcept));
 };
 
 TEST_F(QuicServerWorkerTest, AcceptObserver) {

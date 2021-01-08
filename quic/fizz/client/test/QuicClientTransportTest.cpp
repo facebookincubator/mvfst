@@ -1930,24 +1930,16 @@ TEST_F(QuicClientTransportTest, SocketClosedDuringOnTransportReady) {
       onTransportReadyMock();
     }
 
-    GMOCK_METHOD1_(, noexcept, , onFlowControlUpdate, void(StreamId));
-    GMOCK_METHOD1_(, noexcept, , onNewBidirectionalStream, void(StreamId));
-    GMOCK_METHOD1_(, noexcept, , onNewUnidirectionalStream, void(StreamId));
-    GMOCK_METHOD2_(
-        ,
-        noexcept,
-        ,
-        onStopSending,
-        void(StreamId, ApplicationErrorCode));
-    GMOCK_METHOD0_(, noexcept, , onTransportReadyMock, void());
-    GMOCK_METHOD0_(, noexcept, , onReplaySafe, void());
-    GMOCK_METHOD0_(, noexcept, , onConnectionEnd, void());
-    GMOCK_METHOD1_(
-        ,
-        noexcept,
-        ,
-        onConnectionError,
-        void(std::pair<QuicErrorCode, std::string>));
+    MOCK_METHOD(void, onFlowControlUpdate, (StreamId), (noexcept));
+    MOCK_METHOD(void, onNewBidirectionalStream, (StreamId), (noexcept));
+    MOCK_METHOD(void, onNewUnidirectionalStream, (StreamId), (noexcept));
+    MOCK_METHOD(void, onStopSending, (StreamId, ApplicationErrorCode),
+                (noexcept));
+    MOCK_METHOD(void, onTransportReadyMock, (), (noexcept));
+    MOCK_METHOD(void, onReplaySafe, (), (noexcept));
+    MOCK_METHOD(void, onConnectionEnd, (), (noexcept));
+    MOCK_METHOD(void, onConnectionError,
+                ((std::pair<QuicErrorCode, std::string>)), (noexcept));
 
    private:
     std::shared_ptr<QuicSocket> socket_;

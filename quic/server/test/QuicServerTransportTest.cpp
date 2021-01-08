@@ -113,7 +113,7 @@ class FakeServerHandshake : public FizzServerHandshake {
     }
   }
 
-  Optional<ClientTransportParameters> getClientTransportParams() override {
+  folly::Optional<ClientTransportParameters> getClientTransportParams() override {
     std::vector<TransportParameter> transportParams;
     transportParams.push_back(encodeIntegerParameter(
         TransportParameterId::initial_max_stream_data_bidi_local,

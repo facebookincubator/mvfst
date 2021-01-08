@@ -19,12 +19,8 @@ namespace quic {
 
 class MockServerConnectionIdRejector : public ServerConnectionIdRejector {
  public:
-  GMOCK_METHOD1_(
-      ,
-      noexcept,
-      ,
-      rejectConnectionIdNonConst,
-      bool(const ConnectionId));
+  MOCK_METHOD(bool, rejectConnectionIdNonConst,
+              (const ConnectionId), (noexcept));
 
   bool rejectConnectionId(const ConnectionId& id) const noexcept override {
     return const_cast<MockServerConnectionIdRejector&>(*this)
@@ -46,16 +42,11 @@ class MockQuicServerTransportFactory : public QuicServerTransportFactory {
     return _make(evb, socket, addr, ctx);
   }
 
-  GMOCK_METHOD4_(
-      ,
-      noexcept,
-      ,
-      _make,
-      QuicServerTransport::Ptr(
-          folly::EventBase* evb,
-          std::unique_ptr<folly::AsyncUDPSocket>& sock,
-          const folly::SocketAddress&,
-          std::shared_ptr<const fizz::server::FizzServerContext>));
+  MOCK_METHOD(QuicServerTransport::Ptr, _make, (folly::EventBase* evb,
+              std::unique_ptr<folly::AsyncUDPSocket>& sock,
+              const folly::SocketAddress&,
+              std::shared_ptr<const fizz::server::FizzServerContext>),
+              (noexcept));
 };
 
 class MockWorkerCallback : public QuicServerWorker::WorkerCallback {
@@ -107,26 +98,12 @@ class MockRoutingCallback : public QuicServerTransport::RoutingCallback {
  public:
   ~MockRoutingCallback() override = default;
 
-  GMOCK_METHOD2_(
-      ,
-      noexcept,
-      ,
-      onConnectionIdAvailable,
-      void(QuicServerTransport::Ptr, ConnectionId));
-  GMOCK_METHOD1_(
-      ,
-      noexcept,
-      ,
-      onConnectionIdBound,
-      void(QuicServerTransport::Ptr));
-  GMOCK_METHOD3_(
-      ,
-      noexcept,
-      ,
-      onConnectionUnbound,
-      void(
-          QuicServerTransport*,
-          const QuicServerTransport::SourceIdentity&,
-          const std::vector<ConnectionIdData>& connIdData));
+  MOCK_METHOD(void, onConnectionIdAvailable,
+              (QuicServerTransport::Ptr, ConnectionId), (noexcept));
+  MOCK_METHOD(void, onConnectionIdBound, (QuicServerTransport::Ptr),
+              (noexcept));
+  MOCK_METHOD(void, onConnectionUnbound, (QuicServerTransport*,
+              const QuicServerTransport::SourceIdentity&,
+              const std::vector<ConnectionIdData>& connIdData), (noexcept));
 };
 } // namespace quic

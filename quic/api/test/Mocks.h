@@ -34,7 +34,7 @@ class MockFrameScheduler : public FrameScheduler {
     return _scheduleFramesForPacket(&builderIn, writableBytes);
   }
 
-  GMOCK_METHOD0_(, const, , hasData, bool());
+  MOCK_METHOD(bool, hasData, (), (const));
   MOCK_METHOD2(
       _scheduleFramesForPacket,
       SchedulingResult(PacketBuilderInterface*, uint32_t));
@@ -43,89 +43,54 @@ class MockFrameScheduler : public FrameScheduler {
 class MockReadCallback : public QuicSocket::ReadCallback {
  public:
   ~MockReadCallback() override = default;
-  GMOCK_METHOD1_(, noexcept, , readAvailable, void(StreamId));
-  GMOCK_METHOD2_(
-      ,
-      noexcept,
-      ,
-      readError,
-      void(
-          StreamId,
-          std::pair<QuicErrorCode, folly::Optional<folly::StringPiece>>));
+  MOCK_METHOD(void, readAvailable, (StreamId), (noexcept));
+  MOCK_METHOD(void, readError, (StreamId,
+              (std::pair<QuicErrorCode, folly::Optional<folly::StringPiece>>)),
+              (noexcept));
 };
 
 class MockPeekCallback : public QuicSocket::PeekCallback {
  public:
   ~MockPeekCallback() override = default;
-  GMOCK_METHOD2_(
-      ,
-      noexcept,
-      ,
-      onDataAvailable,
-      void(StreamId, const folly::Range<PeekIterator>&));
+  MOCK_METHOD(void, onDataAvailable,
+              (StreamId, const folly::Range<PeekIterator>&), (noexcept));
 };
 
 class MockWriteCallback : public QuicSocket::WriteCallback {
  public:
   ~MockWriteCallback() override = default;
 
-  GMOCK_METHOD2_(, noexcept, , onStreamWriteReady, void(StreamId, uint64_t));
-  GMOCK_METHOD1_(, noexcept, , onConnectionWriteReady, void(uint64_t));
-  GMOCK_METHOD2_(
-      ,
-      noexcept,
-      ,
-      onStreamWriteError,
-      void(
-          StreamId,
-          std::pair<QuicErrorCode, folly::Optional<folly::StringPiece>>));
-  GMOCK_METHOD1_(
-      ,
-      noexcept,
-      ,
-      onConnectionWriteError,
-      void(std::pair<QuicErrorCode, folly::Optional<folly::StringPiece>>));
+  MOCK_METHOD(void, onStreamWriteReady, (StreamId, uint64_t), (noexcept));
+  MOCK_METHOD(void, onConnectionWriteReady, (uint64_t), (noexcept));
+
+  using Error = std::pair<QuicErrorCode, folly::Optional<folly::StringPiece>>;
+  MOCK_METHOD(void, onStreamWriteError, (StreamId, Error), (noexcept));
+  MOCK_METHOD(void, onConnectionWriteError, (Error), (noexcept));
 };
 
 class MockConnectionCallback : public QuicSocket::ConnectionCallback {
  public:
   ~MockConnectionCallback() override = default;
 
-  GMOCK_METHOD1_(, noexcept, , onFlowControlUpdate, void(StreamId));
-  GMOCK_METHOD1_(, noexcept, , onNewBidirectionalStream, void(StreamId));
-  GMOCK_METHOD1_(, noexcept, , onNewUnidirectionalStream, void(StreamId));
-  GMOCK_METHOD2_(
-      ,
-      noexcept,
-      ,
-      onStopSending,
-      void(StreamId, ApplicationErrorCode));
-  GMOCK_METHOD0_(, noexcept, , onConnectionEnd, void());
-  GMOCK_METHOD1_(
-      ,
-      noexcept,
-      ,
-      onConnectionError,
-      void(std::pair<QuicErrorCode, std::string>));
-  GMOCK_METHOD0_(, noexcept, , onReplaySafe, void());
-  GMOCK_METHOD0_(, noexcept, , onTransportReady, void());
-  GMOCK_METHOD0_(, noexcept, , onFirstPeerPacketProcessed, void());
-  GMOCK_METHOD1_(, noexcept, , onBidirectionalStreamsAvailable, void(uint64_t));
-  GMOCK_METHOD1_(
-      ,
-      noexcept,
-      ,
-      onUnidirectionalStreamsAvailable,
-      void(uint64_t));
-  GMOCK_METHOD0_(, noexcept, , onAppRateLimited, void());
+  MOCK_METHOD(void, onFlowControlUpdate, (StreamId), (noexcept));
+  MOCK_METHOD(void, onNewBidirectionalStream, (StreamId), (noexcept));
+  MOCK_METHOD(void, onNewUnidirectionalStream, (StreamId), (noexcept));
+  MOCK_METHOD(void, onStopSending, (StreamId, ApplicationErrorCode), (noexcept));
+  MOCK_METHOD(void, onConnectionEnd, (), (noexcept));
+  MOCK_METHOD(void, onConnectionError, ((std::pair<QuicErrorCode, std::string>)), (noexcept));
+  MOCK_METHOD(void, onReplaySafe, (), (noexcept));
+  MOCK_METHOD(void, onTransportReady, (), (noexcept));
+  MOCK_METHOD(void, onFirstPeerPacketProcessed, (), (noexcept));
+  MOCK_METHOD(void, onBidirectionalStreamsAvailable, (uint64_t), (noexcept));
+  MOCK_METHOD(void, onUnidirectionalStreamsAvailable, (uint64_t), (noexcept));
+  MOCK_METHOD(void, onAppRateLimited, (), (noexcept));
 };
 
 class MockDeliveryCallback : public QuicSocket::DeliveryCallback {
  public:
   ~MockDeliveryCallback() override = default;
-  MOCK_METHOD3(
-      onDeliveryAck,
-      void(StreamId, uint64_t, std::chrono::microseconds));
+  MOCK_METHOD(void, onDeliveryAck,
+              (StreamId, uint64_t, std::chrono::microseconds), (noexcept));
   MOCK_METHOD2(onCanceled, void(StreamId, uint64_t));
 };
 
@@ -157,13 +122,13 @@ class MockByteEventCallback : public QuicSocket::ByteEventCallback {
 class MockDataExpiredCallback : public QuicSocket::DataExpiredCallback {
  public:
   ~MockDataExpiredCallback() override = default;
-  GMOCK_METHOD2_(, noexcept, , onDataExpired, void(StreamId, uint64_t));
+  MOCK_METHOD(void, onDataExpired, (StreamId, uint64_t), (noexcept));
 };
 
 class MockDataRejectedCallback : public QuicSocket::DataRejectedCallback {
  public:
   ~MockDataRejectedCallback() override = default;
-  GMOCK_METHOD2_(, noexcept, , onDataRejected, void(StreamId, uint64_t));
+  MOCK_METHOD(void, onDataRejected, (StreamId, uint64_t), (noexcept));
 };
 
 class MockQuicTransport : public QuicServerTransport {
@@ -204,24 +169,19 @@ class MockQuicTransport : public QuicServerTransport {
 
   MOCK_METHOD0(customDestructor, void());
 
-  GMOCK_METHOD0_(, const, , getEventBase, folly::EventBase*());
+  MOCK_METHOD(folly::EventBase*, getEventBase, (), (const));
 
   MOCK_CONST_METHOD0(getPeerAddress, const folly::SocketAddress&());
 
   MOCK_CONST_METHOD0(getOriginalPeerAddress, const folly::SocketAddress&());
 
-  GMOCK_METHOD1_(
-      ,
-      ,
-      ,
-      setOriginalPeerAddress,
-      void(const folly::SocketAddress&));
+  MOCK_METHOD(void, setOriginalPeerAddress, (const folly::SocketAddress&), ());
 
-  GMOCK_METHOD0_(, , , accept, void());
+  MOCK_METHOD(void, accept, (), ());
 
-  GMOCK_METHOD1_(, , , setTransportSettings, void(TransportSettings));
+  MOCK_METHOD(void, setTransportSettings, (TransportSettings), ());
 
-  GMOCK_METHOD1_(, noexcept, , setPacingTimer, void(TimerHighRes::SharedPtr));
+  MOCK_METHOD(void, setPacingTimer, (TimerHighRes::SharedPtr), (noexcept));
 
   void onNetworkData(
       const folly::SocketAddress& peer,
@@ -229,71 +189,34 @@ class MockQuicTransport : public QuicServerTransport {
     onNetworkData(peer, networkData);
   }
 
-  GMOCK_METHOD2_(
-      ,
-      noexcept,
-      ,
-      onNetworkData,
-      void(const folly::SocketAddress&, const NetworkData&));
+  MOCK_METHOD(void, onNetworkData,
+              (const folly::SocketAddress&, const NetworkData&), (noexcept));
 
-  GMOCK_METHOD1_(
-      ,
-      noexcept,
-      ,
-      setRoutingCallback,
-      void(QuicServerTransport::RoutingCallback*));
+  MOCK_METHOD(void, setRoutingCallback,
+              (QuicServerTransport::RoutingCallback*), (noexcept));
 
-  GMOCK_METHOD1_(
-      ,
-      noexcept,
-      ,
-      setSupportedVersions,
-      void(const std::vector<QuicVersion>&));
+  MOCK_METHOD(void, setSupportedVersions,
+              (const std::vector<QuicVersion>&), (noexcept));
 
-  GMOCK_METHOD1_(
-      ,
-      noexcept,
-      ,
-      setServerConnectionIdParams,
-      void(ServerConnectionIdParams));
+  MOCK_METHOD(void, setServerConnectionIdParams, (ServerConnectionIdParams),
+              (noexcept));
 
-  GMOCK_METHOD1_(
-      ,
-      noexcept,
-      ,
-      close,
-      void(folly::Optional<std::pair<QuicErrorCode, std::string>>));
+  using Error = folly::Optional<std::pair<QuicErrorCode, std::string>>;
+  MOCK_METHOD(void, close, (Error), (noexcept));
+  MOCK_METHOD(void, closeNow, (Error), (noexcept));
 
-  GMOCK_METHOD1_(
-      ,
-      noexcept,
-      ,
-      closeNow,
-      void(folly::Optional<std::pair<QuicErrorCode, std::string>>));
+  MOCK_METHOD(bool, hasShutdown, (), (const));
 
-  GMOCK_METHOD0_(, const, , hasShutdown, bool());
+  MOCK_METHOD(folly::Optional<ConnectionId>, getClientConnectionId, (),
+              (const));
 
-  GMOCK_METHOD0_(
-      ,
-      const,
-      ,
-      getClientConnectionId,
-      folly::Optional<ConnectionId>());
-  GMOCK_METHOD0_(
-      ,
-      const,
-      ,
-      getClientChosenDestConnectionId,
-      folly::Optional<ConnectionId>());
+  MOCK_METHOD(folly::Optional<ConnectionId>, getClientChosenDestConnectionId,
+              (), (const));
 
-  GMOCK_METHOD1_(
-      ,
-      noexcept,
-      ,
-      setTransportStatsCallback,
-      void(QuicTransportStatsCallback*));
+  MOCK_METHOD(void, setTransportStatsCallback, (QuicTransportStatsCallback*),
+              (noexcept));
 
-  GMOCK_METHOD1_(, noexcept, , setConnectionIdAlgo, void(ConnectionIdAlgo*));
+  MOCK_METHOD(void, setConnectionIdAlgo, (ConnectionIdAlgo*), (noexcept));
 
   MOCK_METHOD1(setBufAccessor, void(BufAccessor*));
 };
@@ -309,50 +232,29 @@ class MockLoopDetectorCallback : public LoopDetectorCallback {
 
 class MockLifecycleObserver : public LifecycleObserver {
  public:
-  GMOCK_METHOD1_(, noexcept, , observerAttach, void(QuicSocket*));
-  GMOCK_METHOD1_(, noexcept, , observerDetach, void(QuicSocket*));
-  GMOCK_METHOD1_(, noexcept, , destroy, void(QuicSocket*));
-  GMOCK_METHOD2_(, noexcept, , evbAttach, void(QuicSocket*, folly::EventBase*));
-  GMOCK_METHOD2_(, noexcept, , evbDetach, void(QuicSocket*, folly::EventBase*));
-  GMOCK_METHOD2_(
-      ,
-      noexcept,
-      ,
-      close,
-      void(
-          QuicSocket*,
-          const folly::Optional<std::pair<QuicErrorCode, std::string>>&));
+  MOCK_METHOD(void, observerAttach, (QuicSocket*), (noexcept));
+  MOCK_METHOD(void, observerDetach, (QuicSocket*), (noexcept));
+  MOCK_METHOD(void, destroy, (QuicSocket*), (noexcept));
+  MOCK_METHOD(void, evbAttach, (QuicSocket*, folly::EventBase*), (noexcept));
+  MOCK_METHOD(void, evbDetach, (QuicSocket*, folly::EventBase*), (noexcept));
+  MOCK_METHOD(void, close, (QuicSocket*,
+              (const folly::Optional<std::pair<QuicErrorCode, std::string>>&)),
+              (noexcept));
 };
 
 class MockInstrumentationObserver : public InstrumentationObserver {
  public:
-  GMOCK_METHOD1_(, noexcept, , observerDetach, void(QuicSocket*));
-  GMOCK_METHOD1_(, noexcept, , appRateLimited, void(QuicSocket*));
-  GMOCK_METHOD2_(
-      ,
-      noexcept,
-      ,
-      packetLossDetected,
-      void(QuicSocket*, const ObserverLossEvent&));
-  GMOCK_METHOD2_(
-      ,
-      noexcept,
-      ,
-      rttSampleGenerated,
-      void(QuicSocket*, const PacketRTT&));
-  GMOCK_METHOD1_(, noexcept, , pmtuProbingStarted, void(QuicSocket*));
-  GMOCK_METHOD2_(
-      ,
-      noexcept,
-      ,
-      pmtuBlackholeDetected,
-      void(QuicSocket*, const PMTUBlackholeEvent&));
-  GMOCK_METHOD2_(
-      ,
-      noexcept,
-      ,
-      pmtuUpperBoundDetected,
-      void(QuicSocket*, const PMTUUpperBoundEvent&));
+  MOCK_METHOD(void, observerDetach, (QuicSocket*), (noexcept));
+  MOCK_METHOD(void, appRateLimited, (QuicSocket*), (noexcept));
+  MOCK_METHOD(void, packetLossDetected, (QuicSocket*, const ObserverLossEvent&),
+              (noexcept));
+  MOCK_METHOD(void, rttSampleGenerated, (QuicSocket*, const PacketRTT&),
+              (noexcept));
+  MOCK_METHOD(void, pmtuProbingStarted, (QuicSocket*), (noexcept));
+  MOCK_METHOD(void, pmtuBlackholeDetected,
+              (QuicSocket*, const PMTUBlackholeEvent&), (noexcept));
+  MOCK_METHOD(void, pmtuUpperBoundDetected,
+              (QuicSocket*, const PMTUUpperBoundEvent&), (noexcept));
 
   static auto getLossPacketMatcher(bool reorderLoss, bool timeoutLoss) {
     return AllOf(
