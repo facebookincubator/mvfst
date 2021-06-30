@@ -155,15 +155,6 @@ bool ServerHandshake::isHandshakeDone() {
   return handshakeDone_;
 }
 
-const fizz::server::State& ServerHandshake::getState() const {
-  return state_;
-}
-
-const folly::Optional<std::string>& ServerHandshake::getApplicationProtocol()
-    const {
-  return state_.alpn();
-}
-
 void ServerHandshake::onError(
     std::pair<std::string, TransportErrorCode> error) {
   VLOG(10) << "ServerHandshake error " << error.first;

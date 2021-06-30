@@ -28,6 +28,17 @@ class FizzServerHandshake : public ServerHandshake {
   const CryptoFactory& getCryptoFactory() const override;
 
   /**
+   * Retuns the clent's certificate.
+   */
+  const std::shared_ptr<const folly::AsyncTransportCertificate>
+  getPeerCertificate() const override;
+
+  /**
+   * Retuns the negotiated ALPN from the handshake.
+   */
+  const folly::Optional<std::string>& getApplicationProtocol() const override;
+
+  /**
    * Returns the context used by the ServerHandshake.
    */
   const fizz::server::FizzServerContext* getContext() const;

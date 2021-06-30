@@ -173,16 +173,6 @@ class ServerHandshake : public Handshake {
    */
   bool isHandshakeDone();
 
-  /**
-   * Returns the fizz server state.
-   */
-  const fizz::server::State& getState() const;
-
-  /**
-   * Retuns the negotiated ALPN from the handshake.
-   */
-  const folly::Optional<std::string>& getApplicationProtocol() const override;
-
   virtual ~ServerHandshake() = default;
 
   void onError(std::pair<std::string, TransportErrorCode> error);
@@ -213,6 +203,11 @@ class ServerHandshake : public Handshake {
    * was an async action pending.
    */
   void processPendingEvents();
+
+  virtual const std::shared_ptr<const folly::AsyncTransportCertificate>
+  getPeerCertificate() const {
+    return nullptr;
+  }
 
  protected:
   Phase phase_{Phase::Handshake};

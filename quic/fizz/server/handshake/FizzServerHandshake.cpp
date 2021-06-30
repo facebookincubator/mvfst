@@ -76,8 +76,18 @@ const CryptoFactory& FizzServerHandshake::getCryptoFactory() const {
   return *cryptoFactory_;
 }
 
+const std::shared_ptr<const folly::AsyncTransportCertificate>
+FizzServerHandshake::getPeerCertificate() const {
+  return state_.clientCert();
+}
+
 const fizz::server::FizzServerContext* FizzServerHandshake::getContext() const {
   return state_.context();
+}
+
+const folly::Optional<std::string>&
+FizzServerHandshake::getApplicationProtocol() const {
+  return state_.alpn();
 }
 
 EncryptionLevel FizzServerHandshake::getReadRecordLayerEncryptionLevel() {
