@@ -173,21 +173,9 @@ class ServerHandshake : public Handshake {
    */
   bool isHandshakeDone();
 
-  /**
-   * Returns the fizz server state.
-   */
-  const fizz::server::State& getState() const;
-
-  /**
-   * Retuns the negotiated ALPN from the handshake.
-   */
-  const folly::Optional<std::string>& getApplicationProtocol() const override;
-
   virtual ~ServerHandshake() = default;
 
   void onError(std::pair<std::string, TransportErrorCode> error);
-
-  void onWriteData(fizz::WriteToSocket& write);
 
   void onHandshakeDone();
 
@@ -204,7 +192,6 @@ class ServerHandshake : public Handshake {
   /**
    * Run the actions once they have been completed.
    */
-  class ActionMoveVisitor;
   void processActions(
       fizz::server::ServerStateMachine::CompletedActions actions);
 
@@ -213,6 +200,11 @@ class ServerHandshake : public Handshake {
    * was an async action pending.
    */
   void processPendingEvents();
+
+  virtual const std::shared_ptr<const folly::AsyncTransportCertificate>
+  getPeerCertificate() const {
+    return nullptr;
+  }
 
  protected:
   Phase phase_{Phase::Handshake};
@@ -227,11 +219,15 @@ class ServerHandshake : public Handshake {
 
   void computeCiphers(CipherKind kind, folly::ByteRange secret);
 
-  fizz::server::State state_;
-  fizz::server::ServerStateMachine machine_;
   QuicConnectionStateBase* conn_;
   folly::DelayedDestruction::DestructorGuard actionGuard_;
   folly::Executor* executor_;
+
+  /**
+   * Various utilities for concrete implementations to use.
+   */
+  bool isCancelled() const;
+  void writeDataToStream(EncryptionLevel encryptionLevel, Buf data);
 
   QuicCryptoState& cryptoState_;
   bool inProcessPendingEvents_{false};
@@ -277,6 +273,9 @@ class ServerHandshake : public Handshake {
    */
   virtual bool processPendingCryptoEvent() = 0;
   virtual void writeNewSessionTicketToCrypto(const AppToken& appToken) = 0;
+
+  virtual void processCryptoActions(
+      fizz::server::ServerStateMachine::CompletedActions actions) = 0;
 }; // namespace quic
 
 } // namespace quic
