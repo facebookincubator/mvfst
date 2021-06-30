@@ -11,6 +11,7 @@
 #include <quic/fizz/handshake/FizzCryptoFactory.h>
 #include <quic/server/handshake/ServerHandshake.h>
 
+#include <fizz/server/FizzServer.h>
 #include <fizz/server/ServerProtocol.h>
 
 namespace quic {
@@ -26,6 +27,17 @@ class FizzServerHandshake : public ServerHandshake {
       std::unique_ptr<CryptoFactory> cryptoFactory);
 
   const CryptoFactory& getCryptoFactory() const override;
+
+  /**
+   * Retuns the clent's certificate.
+   */
+  const std::shared_ptr<const folly::AsyncTransportCertificate>
+  getPeerCertificate() const override;
+
+  /**
+   * Retuns the negotiated ALPN from the handshake.
+   */
+  const folly::Optional<std::string>& getApplicationProtocol() const override;
 
   /**
    * Returns the context used by the ServerHandshake.
@@ -45,6 +57,13 @@ class FizzServerHandshake : public ServerHandshake {
   void processAccept() override;
   bool processPendingCryptoEvent() override;
   void writeNewSessionTicketToCrypto(const AppToken& appToken) override;
+
+  class ActionMoveVisitor;
+  void processCryptoActions(
+      fizz::server::ServerStateMachine::CompletedActions actions) override;
+
+  fizz::server::State state_;
+  fizz::server::ServerStateMachine machine_;
 
   using PendingEvent = fizz::WriteNewSessionTicket;
   std::deque<PendingEvent> pendingEvents_;
